@@ -18,6 +18,9 @@ struct TodoItem: Identifiable, Equatable {
    // タスクのタイトル
    var title: String
    
+   // タスクの詳細情報
+   var details: String = ""
+   
    // タスクの完了状態（デフォルトは未完了）
    var isCompleted: Bool = false
    

@@ -17,7 +17,7 @@ class DataManager {
      */
     func saveTodoItems(_ items: [TodoItem]) {
         // TodoItemをディクショナリ形式に変換
-        let data = items.map { ["id": $0.id.uuidString, "title": $0.title, "isCompleted": $0.isCompleted] }
+        let data = items.map { ["id": $0.id.uuidString, "title": $0.title, "details": $0.details, "isCompleted": $0.isCompleted] }
         // UserDefaultsに保存
         UserDefaults.standard.set(data, forKey: todoItemsKey)
     }
@@ -42,8 +42,13 @@ class DataManager {
                 return nil  // 必要なプロパティがない場合はnilを返す
             }
             
+            // 詳細情報は必須ではなく、存在しない場合は空文字を設定
+            let details = dict["details"] as? String ?? ""
+            
             // TodoItemオブジェクトを生成して返す
-            return TodoItem(id: id, title: title, isCompleted: isCompleted)
+            var item = TodoItem(id: id, title: title, isCompleted: isCompleted)
+            item.details = details
+            return item
         }
     }
 }

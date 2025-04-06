@@ -9,6 +9,7 @@
 //
 
 import SwiftUI
+// タスク詳細画面を使用するためのインポート
 
 struct ContentView: View {
     // DataManagerからタスクデータを読み込んで初期化
@@ -38,19 +39,31 @@ struct ContentView: View {
                 // タスクのリスト表示部分
                 List {
                     // 各タスクをループで表示
-                    ForEach(todoItems) { item in
-                        HStack {
-                            // タスクの完了状態を示すアイコン(タップで切り替え可能)
-                            Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
-                                .foregroundColor(item.isCompleted ? .green : .gray)
-                                .onTapGesture {
-                                    toggleItemCompletion(item)
+                    ForEach($todoItems) { $item in
+                        NavigationLink(destination: TaskDetailView(todoItem: $item)) {
+                            HStack {
+                                // タスクの完了状態を示すアイコン(タップで切り替え可能)
+                                Image(systemName: item.isCompleted ? "checkmark.circle.fill" : "circle")
+                                    .foregroundColor(item.isCompleted ? .green : .gray)
+                                    .onTapGesture {
+                                        toggleItemCompletion(item)
+                                    }
+                                
+                                VStack(alignment: .leading) {
+                                    // タスクのタイトル(完了時は取り消し線と色変更)
+                                    Text(item.title)
+                                        .strikethrough(item.isCompleted)
+                                        .foregroundColor(item.isCompleted ? .gray : .primary)
+                                    
+                                    // 詳細情報があれば表示(プレビューとして)
+                                    if !item.details.isEmpty {
+                                        Text(item.details)
+                                            .font(.caption)
+                                            .foregroundColor(.gray)
+                                            .lineLimit(1)
+                                    }
                                 }
-                            
-                            // タスクのタイトル(完了時は取り消し線と色変更)
-                            Text(item.title)
-                                .strikethrough(item.isCompleted)
-                                .foregroundColor(item.isCompleted ? .gray : .primary)
+                            }
                         }
                     }
                     // スワイプでタスク削除機能を有効化
@@ -82,7 +95,7 @@ struct ContentView: View {
     // タスクの完了状態を切り替えるメソッド
     private func toggleItemCompletion(_ item: TodoItem) {
         // 指定されたアイテムのインデックスを探す
-        if let index = todoItems.firstIndex(of: item) {
+        if let index = todoItems.firstIndex(where: { $0.id == item.id }) {
             // 完了状態を反転(true→false、false→true)
             todoItems[index].isCompleted.toggle()
         }
